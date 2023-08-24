@@ -81,4 +81,45 @@ int main()
         }
         temp = temp->next;
     }
+
+    // Deleting first element
+    temp = head->next;
+    free(head);
+    head = temp;
+
+    // Deleting last element
+    temp = head;
+    while (temp->next != tail)
+    {
+        temp = temp->next;
+    }
+    free(tail);
+    tail = temp;
+    tail->next = NULL;
+
+    // Deleting element in middle
+    // Example: deleting the third element
+    int n2 = 3;
+    temp = head;
+
+    for (int i = 0; i < n2 - 2; i++)
+    {
+        temp = temp->next;
+    }
+    temp2 = temp->next;
+    temp->next = temp->next->next;
+    free(temp2);
+
+    // Printing our final list:
+    temp = head;
+    printf("\n\n");
+    while (1)
+    {
+        printf("%d ", temp->data);
+        if (temp == tail)
+        {
+            break;
+        }
+        temp = temp->next;
+    }
 }

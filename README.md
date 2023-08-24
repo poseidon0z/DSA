@@ -1,6 +1,6 @@
 # DSA
 
-## singly linked list output:
+## Singly linked list output:
 
 ![Simply Linked List sample output](Outputs/singly_linked_list.png)
 

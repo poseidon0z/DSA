@@ -66,4 +66,13 @@ int main()
         printf("%d", temp->data);
         temp = temp->next;
     }
+    tail->next = head->next;
+    temp = head;
+    head = head->next;
+    free(temp);
+    for (int i = 0; i < 8; i++)
+    {
+        printf("%d", temp->data);
+        temp = temp->next;
+    }
 }
