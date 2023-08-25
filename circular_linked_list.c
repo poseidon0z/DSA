@@ -58,21 +58,38 @@ int main()
     tail->next = temp2;
     tail = temp2;
     tail->next = head;
-
-    // Printing the final list
-    temp = head;
-    for (int i = 0; i < 9; i++)
-    {
-        printf("%d", temp->data);
-        temp = temp->next;
-    }
+    // deleting first element
     tail->next = head->next;
     temp = head;
     head = head->next;
     free(temp);
-    for (int i = 0; i < 8; i++)
+    // Deleting elements from the middle
+    printf("Enter the element's position to be deleted");
+    scanf("%d", &pos);
+    temp = head;
+    for (int i = 0; i < pos - 2; i++)
+    {
+        temp = temp->next;
+    }
+    temp2 = temp->next;
+    temp->next = temp->next->next;
+    free(temp2);
+
+    // deleting last element
+    temp = head;
+    while (temp->next != tail)
+    {
+        temp = temp->next;
+    }
+    tail = temp;
+    temp2 = temp->next;
+    temp->next = head;
+    free(temp2);
+    temp = head;
+    while (temp != tail)
     {
         printf("%d", temp->data);
         temp = temp->next;
     }
+    printf("%d", tail->data);
 }
