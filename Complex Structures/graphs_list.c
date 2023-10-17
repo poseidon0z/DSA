@@ -1,83 +1,84 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <limits.h>
-#include <stdio.h>
-#include <malloc.h>
 #include <stdbool.h>
 
-struct Queue
+const int limit = 4;
+
+struct queue
 {
-    int front, rear, size;
-    unsigned capacity;
+    int rear;
     int *array;
 };
 
-struct Queue *createQueue(unsigned capacity)
+void *enqueue(struct queue *q, int value)
 {
-    struct Queue *queue = (struct Queue *)malloc(
-        sizeof(struct Queue));
-    queue->capacity = capacity;
-    queue->front = queue->size = 0;
-
-    queue->rear = capacity - 1;
-    queue->array = (int *)malloc(
-        queue->capacity * sizeof(int));
-    return queue;
+    if (q->rear == 3)
+    {
+        printf("Queue is full!\n");
+        return;
+    }
+    q->rear = q->rear + 1;
+    *(q->array + q->rear) = value;
 }
 
-bool isPresent(struct Queue *queue, int value)
+int dequeue(struct queue *q)
 {
-    for (int i = 0; i < sizeof(queue->array) / sizeof(int); i++)
+    if (q->rear == -1)
     {
-        if ((queue->array)[i] == value)
+        printf("Queue is empty!\n");
+        return -1;
+    }
+    int val = *(q->array);
+    for (int i = 0; i < limit - 1; i++)
+    {
+        *(q->array + i) = *(q->array + i + 1);
+    }
+    q->rear = q->rear - 1;
+    return val;
+}
+
+void printqueue(struct queue *q)
+{
+    int *temp = q->array;
+    if (q->rear == -1)
+    {
+        printf("Queue is empty!\n");
+        return;
+    }
+    while (temp != q->array + q->rear)
+    {
+        printf("%d ", *(temp));
+        temp++;
+    }
+    if (q->rear > 0)
+    {
+        printf("%d\n", *(q->array + q->rear));
+    }
+}
+
+bool inqueue(struct queue *q, int value)
+{
+    int *temp = q->array;
+    if (q->rear == -1)
+    {
+        return false;
+    }
+    while (temp != q->array + q->rear)
+    {
+        if (*temp == value)
+        {
+            return true;
+        }
+        temp++;
+    }
+    if (q->rear > 0)
+    {
+        if (*temp == value)
         {
             return true;
         }
     }
     return false;
-}
-
-int isFull(struct Queue *queue)
-{
-    return (queue->size == queue->capacity);
-}
-
-int isEmpty(struct Queue *queue)
-{
-    return (queue->size == 0);
-}
-
-void enqueue(struct Queue *queue, int item)
-{
-    if (isFull(queue))
-        return;
-    queue->rear = (queue->rear + 1) % queue->capacity;
-    queue->array[queue->rear] = item;
-    queue->size = queue->size + 1;
-}
-
-int dequeue(struct Queue *queue)
-{
-    if (isEmpty(queue))
-        return INT_MIN;
-    int item = queue->array[queue->front];
-    queue->front = (queue->front + 1) % queue->capacity;
-    queue->size = queue->size - 1;
-    return item;
-}
-
-int front(struct Queue *queue)
-{
-    if (isEmpty(queue))
-        return INT_MIN;
-    return queue->array[queue->front];
-}
-
-int rear(struct Queue *queue)
-{
-    if (isEmpty(queue))
-        return INT_MIN;
-    return queue->array[queue->rear];
 }
 struct graph
 {
@@ -139,7 +140,9 @@ void printgraph(struct graph *mygraph)
 void bfs(struct graph *mygraph)
 {
     int visited[4] = {0, 0, 0, 0};
-    struct Queue *Q = createQueue(4);
+    struct queue *q = (struct queue *)malloc(sizeof(struct queue));
+    q->array = (int *)malloc(sizeof(int) * limit);
+    q->rear = -1;
     int k = 0;
     visited[k] = 0;
     k++;
@@ -150,7 +153,7 @@ void bfs(struct graph *mygraph)
         struct node *temp = mygraph->heads[latest];
         while (temp != NULL)
         {
-            bool flag = !isPresent(Q, temp->vertex);
+            bool flag = !inqueue(q, temp->vertex);
             for (int i = 0; i < 4; i++)
             {
                 if (visited[i] == temp->vertex)
@@ -160,15 +163,15 @@ void bfs(struct graph *mygraph)
             }
             if (flag == true)
             {
-                enqueue(Q, temp->vertex);
+                enqueue(q, temp->vertex);
             }
             temp = temp->next;
         }
-        if (isEmpty(Q))
+        if (q->rear == -1)
         {
             break;
         }
-        latest = dequeue(Q);
+        latest = dequeue(q);
         visited[k] = latest;
         k++;
         printf("%d ", latest);
@@ -178,7 +181,11 @@ void bfs(struct graph *mygraph)
 int main()
 {
     struct graph *mygraph = makegraph();
+
+    printf("\nPrinting graph: \n");
     printgraph(mygraph);
+
+    printf("\nBFS: ");
     bfs(mygraph);
     return 0;
 }

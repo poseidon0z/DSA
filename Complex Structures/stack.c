@@ -1,55 +1,68 @@
 #include <stdio.h>
 
-int *push(int *stack, int *top, int val)
+const int limit = 4;
+
+struct stack
 {
-    if (top == &(stack[4]))
+    int top;
+    int *array;
+};
+
+void push(struct stack *s, int value)
+{
+    if (s->top == 4)
     {
-        printf("Stack is full!\n");
+        printf("Stack is full\n");
+        return;
     }
-    else
-    {
-        top++;
-        *top = val;
-    }
-    return top;
+    s->top++;
+    *(s->array + s->top) = value;
 }
 
-int *pop(int *stack, int *top)
+int pop(struct stack *s)
 {
-    if (top == stack - 1)
+    if (s->top == -1)
     {
         printf("Stack is empty!\n");
+        return;
     }
-    else
-    {
-        *top = 0;
-        top--;
-    }
-    return top;
+    int value = *(s->array + s->top);
+    s->top--;
+    return value;
 }
 
-void printstack(int *stack, int *top)
+void printstack(struct stack *s)
 {
-    int i = 0;
-    while (&(stack[i]) != top + 1)
+    if (s->top == -1)
     {
-        printf("%d ", stack[i]);
-        i++;
+        printf("Stack is empty!\n");
+        return;
     }
-    printf("\n");
+    int *temp = s->array;
+    while (s->array + s->top != temp)
+    {
+        printf("%d ", *temp);
+        temp++;
+    }
+    if (s->top > 0)
+    {
+        printf("%d\n", *(s->array + s->top));
+    }
 }
+
 int main()
 {
-    int stack[5];
-    int *top = stack - 1;
-    top = pop(stack, top);
-    top = push(stack, top, 1);
-    top = push(stack, top, 2);
-    top = push(stack, top, 3);
-    top = push(stack, top, 4);
-    top = push(stack, top, 5);
-    top = push(stack, top, 2);
-    printstack(stack, top);
-    top = pop(stack, top);
-    printstack(stack, top);
+    struct stack *s = (struct stack *)malloc(sizeof(struct stack));
+    s->array = (int *)malloc(sizeof(int) * limit);
+    s->top = -1;
+    pop(s);
+    push(s, 1);
+    push(s, 2);
+    push(s, 3);
+    push(s, 4);
+    push(s, 5);
+    push(s, 2);
+    printstack(s);
+    printf("%d\n", pop(s));
+    printstack(s);
 }

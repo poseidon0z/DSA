@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 const int limit = 4;
+
 struct queue
 {
     int rear;
@@ -60,6 +61,7 @@ bool inqueue(struct queue *q, int value)
     int *temp = q->array;
     if (q->rear == -1)
     {
+        printf("Queue is empty!\n");
         return false;
     }
     while (temp != q->array + q->rear)
@@ -80,83 +82,23 @@ bool inqueue(struct queue *q, int value)
     return false;
 }
 
-const int length = 4;
-int array[4][4];
-void input()
+int main()
 {
-    for (int i = 0; i < length; i++)
-    {
-        for (int j = 0; j < length; j++)
-        {
-            scanf("%d", &array[i][j]);
-        }
-    }
-}
-void print()
-{
-    for (int i = 0; i < length; i++)
-    {
-        for (int j = 0; j < length; j++)
-        {
-            printf("%d ", array[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-void bfs()
-{
-
-    int visited[4];
-
     struct queue *q = (struct queue *)malloc(sizeof(struct queue));
     q->array = (int *)malloc(sizeof(int) * limit);
     q->rear = -1;
-
-    int k = 0;
-    visited[k] = 0;
-    k++;
-    printf("0 ");
-    int latest = 0;
-    while (1)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (array[latest][j] == 1)
-            {
-                bool flag = !inqueue(q, j);
-                for (int i = 0; i < 4; i++)
-                {
-                    if (visited[i] == j)
-                    {
-                        flag = false;
-                    }
-                }
-                if (flag == true)
-                {
-                    enqueue(q, j);
-                }
-            }
-        }
-        if (q->rear == -1)
-        {
-            break;
-        }
-        latest = dequeue(q);
-        visited[k] = latest;
-        k++;
-        printf("%d ", latest);
-    }
-}
-int main()
-{
-    printf("Input:\n");
-    input();
-
-    printf("\nOutput:\n");
-    print();
-
-    printf("\nBFS: ");
-    bfs();
-    return 0;
+    enqueue(q, 1);
+    enqueue(q, 2);
+    enqueue(q, 3);
+    enqueue(q, 4);
+    enqueue(q, 5);
+    printqueue(q);
+    dequeue(q);
+    printqueue(q);
+    printf("%s\n", inqueue(q, 4) ? "true" : "false");
+    printf("%s\n", inqueue(q, 8) ? "true" : "false");
+    dequeue(q);
+    dequeue(q);
+    dequeue(q);
+    dequeue(q);
 }
