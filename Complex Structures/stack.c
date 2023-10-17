@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <malloc.h>
 
 const int limit = 4;
 
@@ -50,6 +52,31 @@ void printstack(struct stack *s)
     }
 }
 
+bool instack(struct stack *s, int value)
+{
+    int *temp = s->array;
+    if (s->top == -1)
+    {
+        printf("Stack is empty!\n");
+        return false;
+    }
+    while (temp != s->array + s->top)
+    {
+        if (*temp == value)
+        {
+            return true;
+        }
+        temp++;
+    }
+    if (s->top > 0)
+    {
+        if (*temp == value)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 int main()
 {
     struct stack *s = (struct stack *)malloc(sizeof(struct stack));
@@ -65,4 +92,6 @@ int main()
     printstack(s);
     printf("%d\n", pop(s));
     printstack(s);
+    printf("%s\n", instack(s, 10) ? "true" : "false");
+    printf("%s\n", instack(s, 4) ? "true" : "false");
 }
