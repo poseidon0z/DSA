@@ -49,32 +49,24 @@ void printinorder(struct node *head)
     }
 }
 
-int kthmin(struct node *head, int k)
+int count = 0;
+struct node *kthmin(struct node *root, int k)
 {
-    int i = 0;
-    if (i == k)
-    {
-        printf("%d", head->key);
-    }
-    if (head->left != NULL || head->right != NULL)
-    {
+    if (root == NULL)
+        return NULL;
 
-        if (head->left != NULL)
-        {
-            i += kthmin(head->left, k - i);
-        }
-        i += 1;
-        if (head->right != NULL)
-        {
-            i += kthmin(head->right, k - i);
-        }
-    }
-    else
-    {
-        i += 1;
-    }
-    return i;
+    struct node *left = kthmin(root->left, k);
+
+    if (left != NULL)
+        return left;
+
+    count++;
+    if (count == k)
+        return root;
+
+    return kthmin(root->right, k);
 }
+
 struct node *delete(struct node *head, int value)
 {
     if (head == NULL)
@@ -138,6 +130,6 @@ int main()
     scanf("%d", &v);
     head = delete (head, v);
     printinorder(head);
-    kthmin(head, 2);
+    printf("\n%d ", kthmin(head, 2)->key);
     return 0;
 }
