@@ -1,95 +1,181 @@
 #include <stdio.h>
+#include <malloc.h>
+
+// Structure for each node of the list
 struct node
 {
-    int data;
+    char value;
     struct node *next;
-} *head, *tail, *temp, *temp2;
+};
+
+// Structure to represent a list
+struct cl_list
+{
+    struct node *head;
+    struct node *tail;
+};
+
+// Add an element to the end of a list
+void append(struct cl_list *li, char value)
+{
+    // Create new node, with required values
+    struct node *new = (struct node *)malloc(sizeof(struct node));
+    new->value = value;
+
+    // Empty list case
+    if (li->head == NULL)
+    {
+        li->head = new;
+        li->tail = new;
+    }
+    else // Existing list case
+    {
+        li->tail->next = new;
+        li->tail = new;
+    }
+
+    new->next = li->head;
+}
+
+// Insert an element to a particular index of the list
+void insert(struct cl_list *li, char value, int index)
+{
+    // Create new node with required value
+    struct node *new = (struct node *)malloc(sizeof(struct node));
+    new->value = value;
+
+    // Empty list case
+    if (li->head == NULL)
+    {
+        if (index == 0)
+        {
+            new->next == new;
+            li->head = new;
+            li->tail = new;
+        }
+        else
+        {
+            printf("Invalid index!\n");
+        }
+    }
+
+    // Insert at head case
+    else if (index == 0)
+    {
+        new->next = li->head;
+        li->head = new;
+        li->tail->next = li->head;
+    }
+    else
+    {
+        struct node *it = li->head;
+        for (int i = 0; i < index - 1 && it != li->tail; i++)
+        {
+            it = it->next;
+        }
+        if (it == li->tail)
+        {
+            // Insert at tail case
+            if (it == li->tail)
+            {
+                li->tail->next = new;
+                li->tail = new;
+                new->next = li->head;
+            }
+            else
+            {
+                printf("Invalid index!\n");
+            }
+        }
+
+        // Insert in middle case
+        else
+        {
+            new->next = it->next;
+            it->next = new;
+        }
+    }
+}
+
+// Delete element at particular index of list
+char delete(struct cl_list *li, int index)
+{
+    // Iterator to go through the list
+    struct node *it = li->head;
+
+    // Empty list case
+    if (it == NULL)
+    {
+        printf("Empty list!\n");
+        return NULL;
+    }
+
+    // Delete head case
+    if (index == 0)
+    {
+        li->head = it->next;
+        char val = it->value;
+        li->tail->next = li->head;
+        free(it);
+        return val;
+    }
+    for (int i = 0; i < index - 1 && it != NULL; i++)
+    {
+        it = it->next;
+    }
+    if (it == NULL)
+    {
+        printf("Index out of bounds!\n");
+        return NULL;
+    }
+
+    // other cases
+    struct node *to_del = it->next;
+    char val = to_del->value;
+    it->next = it->next->next;
+
+    // Extra condition for tail
+    if (to_del->next == NULL)
+    {
+        li->tail = it;
+    }
+
+    free(to_del);
+    return val;
+}
+
+// Print all the elements of a list
+void print(struct cl_list *li)
+{
+    struct node *it = li->head;
+    if (it != NULL)
+    {
+        printf("[%c", it->value);
+        it = it->next;
+        while (it != li->tail)
+        {
+            printf(" ,%c", it->value);
+            it = it->next;
+        }
+        printf(" ,%c]\n", it->value);
+    }
+    else
+    {
+        printf("[]\n");
+    }
+}
 
 int main()
 {
-    // Creating circular linked list
-    temp = (struct node *)malloc(sizeof(struct node));
-    printf("Enter first data: ");
-    scanf("%d", &(temp->data));
-    temp->next = temp;
-    head = temp;
-    tail = temp;
-
-    // Adding further elements
-    for (int i = 0; i < 5; i++)
-    {
-        temp2 = (struct node *)malloc(sizeof(struct node));
-        printf("Enter data: ");
-        scanf("%d", &(temp2->data));
-        temp->next = temp2;
-        temp2->next = head;
-        temp = temp2;
-        tail = temp2;
-    }
-
-    // Adding element to beginning
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    temp2->next = head;
-    printf("Enter value to add to beginning: ");
-    scanf("%d", &(temp2->data));
-    head = temp2;
-    tail->next = head;
-
-    // Adding element to middle
-    printf("Enter the position");
-    int pos;
-    scanf("%d", &pos);
-
-    temp = head;
-    for (int i = 0; i < pos - 2; i++)
-    {
-        temp = temp->next;
-    }
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    temp2->next = temp->next;
-    temp->next = temp2;
-    printf("Enter teh value to add to this postion: ");
-    scanf("%d", &(temp2->data));
-
-    // Adding element to end
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    printf("Enter data to add to end: ");
-    scanf("%d", &(temp2->data));
-    tail->next = temp2;
-    tail = temp2;
-    tail->next = head;
-    // deleting first element
-    tail->next = head->next;
-    temp = head;
-    head = head->next;
-    free(temp);
-    // Deleting elements from the middle
-    printf("Enter the element's position to be deleted");
-    scanf("%d", &pos);
-    temp = head;
-    for (int i = 0; i < pos - 2; i++)
-    {
-        temp = temp->next;
-    }
-    temp2 = temp->next;
-    temp->next = temp->next->next;
-    free(temp2);
-
-    // deleting last element
-    temp = head;
-    while (temp->next != tail)
-    {
-        temp = temp->next;
-    }
-    tail = temp;
-    temp2 = temp->next;
-    temp->next = head;
-    free(temp2);
-    temp = head;
-    while (temp != tail)
-    {
-        printf("%d", temp->data);
-        temp = temp->next;
-    }
-    printf("%d", tail->data);
+    struct cl_list *li = (struct cl_list *)malloc(sizeof(struct cl_list));
+    print(li);
+    delete (li, 0);
+    append(li, 'a');
+    insert(li, '\"', 0);
+    append(li, 'd');
+    print(li);
+    delete (li, 0);
+    print(li);
+    insert(li, 'i', 2);
+    print(li);
 }

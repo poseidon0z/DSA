@@ -1,91 +1,185 @@
 #include <stdio.h>
+#include <malloc.h>
+
 struct node
 {
-    int data;
-    struct node *next;
     struct node *prev;
-} *head, *tail, *temp1, *temp2;
+    char value;
+    struct node *next;
+};
+
+struct dl_list
+{
+    struct node *head;
+    struct node *tail;
+};
+
+// Add an element to the end of a list
+void append(struct dl_list *li, char value)
+{
+    // Create new node, with required values
+    struct node *new = (struct node *)malloc(sizeof(struct node));
+    new->value = value;
+    new->next = NULL;
+
+    // Empty list case
+    if (li->head == NULL)
+    {
+        li->head = new;
+        li->tail = new;
+        new->prev = NULL;
+    }
+    else // Existing list case
+    {
+        li->tail->next = new;
+        new->prev = li->tail;
+        li->tail = new;
+    }
+}
+
+// Insert an element to a particular index of the list
+void insert(struct dl_list *li, char value, int index)
+{
+    // Create new node with required value
+    struct node *new = (struct node *)malloc(sizeof(struct node));
+    new->value = value;
+
+    // Empty list case
+    if (li->head == NULL)
+    {
+        if (index == 0)
+        {
+            new->next == NULL;
+            new->prev = NULL;
+            li->head = new;
+            li->tail = new;
+        }
+        else
+        {
+            printf("Invalid index!\n");
+        }
+    }
+
+    // Insert at head case
+    else if (index == 0)
+    {
+        new->next = li->head;
+        li->head->prev = new;
+        li->head = new;
+    }
+    else
+    {
+        struct node *it = li->head;
+        for (int i = 0; i < index && it->next != NULL; i++)
+        {
+            it = it->next;
+        }
+        if (it->next == NULL)
+        {
+            // Insert at tail case
+            if (it == li->tail)
+            {
+                li->tail->next = new;
+                new->prev = li->tail;
+                li->tail = new;
+                new->next = NULL;
+            }
+            else
+            {
+                printf("Invalid index!\n");
+            }
+        }
+
+        // Insert in middle case
+        else
+        {
+            new->next = it->next;
+            it->next->prev = new;
+            new->prev = it;
+            it->next = new;
+        }
+    }
+}
+
+// Delete element at particular index of list
+char delete(struct dl_list *li, int index)
+{
+    // Iterator to go through the list
+    struct node *it = li->head;
+
+    // Empty list case
+    if (it == NULL)
+    {
+        printf("Empty list!\n");
+        return NULL;
+    }
+
+    // Delete head case
+    if (index == 0)
+    {
+        li->head = it->next;
+        char val = it->value;
+        free(it);
+        return val;
+    }
+    for (int i = 0; i < index && it != NULL; i++)
+    {
+        it = it->next;
+    }
+    if (it == NULL)
+    {
+        printf("Index out of bounds!\n");
+        return NULL;
+    }
+
+    // other cases
+    struct node *to_del = it;
+    char val = to_del->value;
+    it->next = it->next->next;
+    it->next->prev = it;
+
+    // Extra condition for tail
+    if (to_del->next == NULL)
+    {
+        li->tail = it;
+    }
+
+    free(to_del);
+    return val;
+}
+
+// Print all the elements of a list
+void print(struct dl_list *li)
+{
+    struct node *it = li->head;
+    if (it != NULL)
+    {
+        printf("[%c", it->value);
+        it = it->next;
+        while (it != NULL)
+        {
+            printf(" ,%c", it->value);
+            it = it->next;
+        }
+        printf("]\n");
+    }
+    else
+    {
+        printf("[]\n");
+    }
+}
+
 int main()
 {
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    printf("Enter first data");
-    scanf("%d", &(temp2->data));
-    temp2->next = NULL;
-    temp2->prev = NULL;
-    head = temp2;
-    tail = temp2;
-    temp1 = head;
-    for (int i = 0; i < 5; i++)
-    {
-        temp2 = (struct node *)malloc(sizeof(struct node));
-        printf("Enter the element");
-        scanf("%d", &(temp2->data));
-        temp1->next = temp2;
-        temp2->prev = temp1;
-        temp1 = temp1->next;
-        tail = temp2;
-    }
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    printf("Enter the value to add in the beginning of the list");
-    scanf("%d", &(temp2->data));
-    temp2->next = head;
-    temp2->prev = NULL;
-    head = temp2;
-
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    int pos;
-    printf("Enter the position ");
-    scanf("%d", &pos);
-    temp1 = head;
-    for (int i = 0; i < pos - 2; i++)
-    {
-        temp1 = temp1->next;
-    }
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    printf("Enter the element to add in the middle of the list");
-    scanf("%d", &(temp2->data));
-    temp2->next = temp1->next;
-    temp2->prev = temp1;
-    temp1->next = temp2;
-    temp2->next->prev = temp2;
-
-    temp2 = (struct node *)malloc(sizeof(struct node));
-    printf("Enter the value to add in the end of the list");
-    scanf("%d", &temp2->data);
-    tail->next = temp2;
-    temp2->prev = tail;
-    temp2->next = NULL;
-    tail = temp2;
-
-    // deleting beginning node
-    temp2 = head->next;
-    temp2->prev = NULL;
-    free(head);
-    head = temp2;
-    temp1 = head;
-    // deleting in the middle
-    printf("Enter the position of element you want to delete");
-    scanf("%d", &pos);
-    temp1 = head;
-    for (int i = 0; i < pos - 2; i++)
-    {
-        temp1 = temp1->next;
-    }
-    temp2 = temp1->next;
-    temp1->next = temp1->next->next;
-    temp1->next->prev = temp1;
-    free(temp2);
-
-    // deleting last element
-    temp1 = tail->prev;
-    temp1->next = NULL;
-    free(tail);
-    tail = temp1;
-    temp1 = head;
-    while (temp1 != tail)
-    {
-        printf("%d", temp1->data);
-        temp1 = temp1->next;
-    }
-    printf("%d", tail->data);
+    struct dl_list *li = (struct dl_list *)malloc(sizeof(struct dl_list));
+    print(li);
+    delete (li, 0);
+    append(li, 'a');
+    insert(li, '\"', 0);
+    append(li, 'd');
+    print(li);
+    delete (li, 0);
+    print(li);
+    insert(li, 'i', 2);
+    print(li);
 }
